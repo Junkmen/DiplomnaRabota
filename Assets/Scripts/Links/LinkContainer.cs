@@ -36,6 +36,16 @@ public class LinkContainer : MonoBehaviour {
         return al.Count > 0 ? GetLink((int)al[rnd], true) : null;
     }
 
+    public bool HasEmptyLinks()
+    {
+        bool hasEmpty = false;
+        foreach(GameObject g in links)
+        {
+            if (!g.GetComponent<Link>().isSnapped) hasEmpty = true;
+        }
+        return hasEmpty;
+    }
+
     public int Size()
     {
         return links.Length;

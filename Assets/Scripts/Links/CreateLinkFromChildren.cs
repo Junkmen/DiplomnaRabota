@@ -23,9 +23,4 @@ public class CreateLinkFromChildren : MonoBehaviour {
         }
         Utils.SafeRemove(this);
   	}
-	
-	void Update ()
-    {
-	
-	}
 }
