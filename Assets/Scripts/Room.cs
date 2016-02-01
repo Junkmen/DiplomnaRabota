@@ -16,30 +16,68 @@ public class Room : MonoBehaviour {
     private int m_id;
     private LinkContainer m_lc;
     public RoomType m_type;
-    private Generator m_generator;
+    public Generator m_generator;
 
     void Awake()
     {
-        id = GetID();
+        m_id = GetID();
         m_lc = GetComponent<LinkContainer>();
+        m_generator = Generator.massGenerator;
+    }
+
+    void Update()
+    {
+        if (m_generator.IsGenerated())
+        {
+            OnFinish();
+            Utils.SafeRemove(this);
+        }
     }
 
     public void OnFinish()
     {
         Utils.SafeRemove(GetComponent<Rigidbody>());
+        Utils.SafeRemove(GetComponent<Collider>());
+        m_lc.DestroyContainer();
+        //gameObject.transform.parent = null;
     }
 
-    void OnCollision()
+
+    void OnTriggerEnter(Collider other)
     {
-        foreach(GameObject g in m_lc.links)
+        Room otherRoom = null;
+       // Debug.Log("Collision");
+        if (other && other.gameObject)
         {
-            g.GetComponent<Link>().other.Unsnap();
+            otherRoom = other.gameObject.GetComponent<Room>();
+            if ( otherRoom == null) return;
+        }
+
+        if (otherRoom.m_id < m_id)
+        {
+            foreach (GameObject g in m_lc.links)
+            {
+                if (g)
+                {
+                    Link otherLink = g.GetComponent<Link>().other;
+                    if (otherLink)
+                    {
+                        otherLink.Unsnap();
+                    }
+                }
+            }
+            m_generator.RemoveUnfinishedRoom(gameObject);
+            Utils.SafeDestroy(gameObject);
+           // Debug.Log("Room destroyed");
         }
     }
 
     public void OnBrokenLink(GameObject link)
     {
-
+        if (IsFinished())
+        {
+            m_generator.AddUnfinishedRoom(gameObject);
+        }
     }
 
     public void OnFatalLink(GameObject link)

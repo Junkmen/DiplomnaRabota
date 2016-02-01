@@ -13,8 +13,13 @@ public class Generator : MonoBehaviour {
     GameObject prevRoom;
     GameObject nextRoom;
 
+    public int roomLimit;
     public PercentageArray rooms;
 
+    public bool IsGenerated()
+    {
+        return isGenerated;
+    }
 
     void InitPrefabs()
     {
@@ -35,6 +40,11 @@ public class Generator : MonoBehaviour {
         UnfinishedRooms.Add(r);
     }
 
+    public void RemoveUnfinishedRoom(GameObject g)
+    {
+        UnfinishedRooms.Remove(g);
+    }
+
     GameObject GetRandomRoom()
     {
 
@@ -43,9 +53,12 @@ public class Generator : MonoBehaviour {
         return g;
     }
 
+    public static Generator massGenerator;
+
 
     void Start ()
     {
+        massGenerator = this;
         InitPrefabs();
         prevRoom = Instantiate(startingRoom, startingPos, startingRoom.transform.rotation) as GameObject;
         prevRoom.GetComponent<Room>().SetGenerator(this);
@@ -75,6 +88,8 @@ public class Generator : MonoBehaviour {
         //if (!Input.GetKeyDown(KeyCode.Space)) return;
         if (isGenerated) return;
 
+        ClearRooms();
+
         int ur_count = UnfinishedRooms.Count;
         for (int i = 0; i < ur_count; i++)
         {
@@ -94,7 +109,7 @@ public class Generator : MonoBehaviour {
 
             SnapRooms(prevRoom, nextRoom, link1, link2);
 
-            isGenerated = xi++ > 200;
+            isGenerated = xi++ > roomLimit || UnfinishedRooms.Count == 0;
         }
 
         ClearRooms();
@@ -114,6 +129,12 @@ public class Generator : MonoBehaviour {
 
         foreach (GameObject g in UnfinishedRooms)
         {
+            if (g == null)
+            {
+                objectsToRemove.Add(g);
+                continue;
+            }
+
             Room r = g.GetComponent<Room>();
             if (r.IsFinished())
             {

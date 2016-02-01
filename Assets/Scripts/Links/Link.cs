@@ -4,6 +4,7 @@ using System.Collections;
 public class Link : MonoBehaviour {
     public bool isSnapped;// { get; set; }
     public Link other;
+    private Room room;
 
     private int m_unsnappedCount = 0;
 
@@ -12,6 +13,7 @@ public class Link : MonoBehaviour {
         isSnapped = false;
         SpriteRenderer r = GetComponent<SpriteRenderer>();
         Utils.SafeRemove(r);
+        room = GetComponentInParent<Room>();
     }
 
     public void Unsnap()
@@ -19,8 +21,8 @@ public class Link : MonoBehaviour {
         m_unsnappedCount++;
         other = null;
         isSnapped = false;
-        Room r = GetComponent<Room>();
-        if (m_unsnappedCount < 3) r.OnBrokenLink(gameObject);
-        else r.OnFatalLink(gameObject);
+        //Room r = gameObject.GetComponent<Room>();
+        if (m_unsnappedCount < 3) room.OnBrokenLink(gameObject);
+        else room.OnFatalLink(gameObject);
     }
 }

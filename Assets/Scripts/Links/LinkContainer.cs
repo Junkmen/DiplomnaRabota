@@ -50,4 +50,13 @@ public class LinkContainer : MonoBehaviour {
     {
         return links.Length;
     }
+
+    public void DestroyContainer()
+    {
+        foreach (GameObject g in links)
+        {
+            Utils.SafeRemove(g.GetComponent<Link>());
+        }
+        Utils.SafeRemove(this);
+    }
 }
