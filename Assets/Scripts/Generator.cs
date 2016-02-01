@@ -16,6 +16,9 @@ public class Generator : MonoBehaviour {
     public int roomLimit;
     public PercentageArray rooms;
 
+    public static int retryAttempts = 3;
+    public int m_retryAttempts = 3;
+
     public bool IsGenerated()
     {
         return isGenerated;
@@ -59,6 +62,7 @@ public class Generator : MonoBehaviour {
     void Start ()
     {
         massGenerator = this;
+        retryAttempts = m_retryAttempts;
         InitPrefabs();
         prevRoom = Instantiate(startingRoom, startingPos, startingRoom.transform.rotation) as GameObject;
         prevRoom.GetComponent<Room>().SetGenerator(this);
@@ -82,7 +86,7 @@ public class Generator : MonoBehaviour {
     }
 
     bool isGenerated = false;
-    int xi = 0;
+    public int roomCount = 0;
 
 	void Update () {
         //if (!Input.GetKeyDown(KeyCode.Space)) return;
@@ -109,7 +113,7 @@ public class Generator : MonoBehaviour {
 
             SnapRooms(prevRoom, nextRoom, link1, link2);
 
-            isGenerated = xi++ > roomLimit || UnfinishedRooms.Count == 0;
+            isGenerated = roomCount++ > roomLimit || UnfinishedRooms.Count == 0;
         }
 
         ClearRooms();

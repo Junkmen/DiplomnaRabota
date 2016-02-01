@@ -25,9 +25,17 @@ public class Room : MonoBehaviour {
         m_generator = Generator.massGenerator;
     }
 
+    ArrayList receivedCollisionIds = new ArrayList();
+
     void Update()
     {
-        if (m_generator.IsGenerated())
+        receivedCollisionIds.Clear();
+       
+    }
+
+    void FixedUpdate()
+    {
+        if (m_generator && m_generator.IsGenerated())
         {
             OnFinish();
             Utils.SafeRemove(this);
@@ -45,6 +53,7 @@ public class Room : MonoBehaviour {
 
     void OnTriggerEnter(Collider other)
     {
+
         Room otherRoom = null;
        // Debug.Log("Collision");
         if (other && other.gameObject)
@@ -52,6 +61,12 @@ public class Room : MonoBehaviour {
             otherRoom = other.gameObject.GetComponent<Room>();
             if ( otherRoom == null) return;
         }
+
+        foreach(int id in receivedCollisionIds)
+        {
+            if (id == otherRoom.m_id) return;
+        }
+        receivedCollisionIds.Add(otherRoom.m_id);
 
         if (otherRoom.m_id < m_id)
         {
@@ -65,10 +80,12 @@ public class Room : MonoBehaviour {
                         otherLink.Unsnap();
                     }
                 }
+            
             }
             m_generator.RemoveUnfinishedRoom(gameObject);
+            m_generator.roomCount--;
             Utils.SafeDestroy(gameObject);
-           // Debug.Log("Room destroyed");
+            // Debug.Log("Room destroyed");
         }
     }
 
@@ -82,7 +99,7 @@ public class Room : MonoBehaviour {
 
     public void OnFatalLink(GameObject link)
     {
-
+        link.GetComponent<Link>().isSnapped = true;
     }
 
     public bool IsFinished()

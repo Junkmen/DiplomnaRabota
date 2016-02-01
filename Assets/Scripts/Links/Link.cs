@@ -20,9 +20,12 @@ public class Link : MonoBehaviour {
     {
         m_unsnappedCount++;
         other = null;
+
+        if (m_unsnappedCount < Generator.retryAttempts) room.OnBrokenLink(gameObject);
+        else room.OnFatalLink(gameObject);
+
         isSnapped = false;
         //Room r = gameObject.GetComponent<Room>();
-        if (m_unsnappedCount < 3) room.OnBrokenLink(gameObject);
-        else room.OnFatalLink(gameObject);
+       
     }
 }
